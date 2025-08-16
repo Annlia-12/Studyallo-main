@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Calendar, Clock, MapPin, Plus, Search } from 'lucide-react';
 
+
+
 interface StudySession {
   id: string;
   subject: string;
@@ -14,6 +16,7 @@ interface StudySession {
   participants: number;
   maxParticipants: number;
 }
+
 
 const StudyBuddy: React.FC = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -98,8 +101,43 @@ const StudyBuddy: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-8">
+    <div className="min-h-screen bg-gradient-to-r from-pink-100 via-purple-100 via-blue-100 via-indigo-100 to-pink-100 relative overflow-hidden py-8">
+
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+     
+
+        {/* Collage Section */}
+<motion.div
+  initial={{ opacity: 0, y: 30 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.8 }}
+  className="mb-12"
+>
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
+    <img
+      src="https://i.pinimg.com/1200x/59/d8/00/59d800e951c5dc59e7680957bbffe3b8.jpg"
+      alt="Study group"
+      className="rounded-xl object-cover h-40 w-full shadow-md"
+    />
+    <img
+      src="https://i.pinimg.com/1200x/7e/93/7d/7e937d465be380ddca5f8f984b1d30f5.jpg"
+      alt="Library study"
+      className="rounded-xl object-cover h-40 w-full shadow-md"
+    />
+    <img
+      src="https://i.pinimg.com/1200x/1f/5c/df/1f5cdf1ebc09465fcc87d78a92dde7da.jpg"
+      alt="Friends learning"
+      className="rounded-xl object-cover h-40 w-full shadow-md"
+    />
+    <img
+      src="https://i.pinimg.com/1200x/ce/e9/8f/cee98f73ef9dee7cd203414d02f93581.jpg"
+      alt="Notebook and laptop"
+      className="rounded-xl object-cover h-40 w-full shadow-md"
+    />
+  </div>
+</motion.div>
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
