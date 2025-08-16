@@ -124,7 +124,7 @@ export default function Home() {
                     Hi, {user.displayName || user.email}
                   </span>
                   <button onClick={logout} className="px-3 py-1.5 rounded-md bg-gray-900 text-white text-sm">
-                    Logout
+                    Logou
                   </button>
                 </>
               ) : (

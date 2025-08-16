@@ -2,7 +2,16 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, User } from "firebase/auth";
 
-const firebaseConfig = { apiKey: "YOUR_API_KEY", authDomain: "YOUR_AUTH_DOMAIN", projectId: "YOUR_PROJECT_ID", storageBucket: "YOUR_STORAGE_BUCKET", messagingSenderId: "YOUR_MESSAGING_SENDER_ID", appId: "YOUR_APP_ID", };
+// 🔹 Firebase config (you can replace with actual keys)
+const firebaseConfig = { 
+  apiKey: "AIzaSyBAPBBCKBn14iQdee9Te9rjWKzy4WKCVF4",
+  authDomain: "studyallo.firebaseapp.com",
+  projectId: "studyallo",
+  storageBucket: "studyallo.firebasestorage.app",
+  messagingSenderId: "678998606280",
+  appId: "1:678998606280:web:d0a6607f29a58436e280fd",
+};
+
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -21,6 +30,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // 🔹 Create initial test user for setup
+  useEffect(() => {
+    const createInitialUser = async () => {
+      try {
+        await createUserWithEmailAndPassword(auth, "test@studyallo.com", "Test1234!");
+      } catch (error: any) {
+        if (error.code !== "auth/email-already-in-use") {
+          console.error("Error creating initial user:", error);
+        }
+      }
+    };
+    createInitialUser();
+  }, []);
+
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
@@ -30,10 +53,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signup = async (email: string, password: string, displayName?: string) => {
-    const { user } = await createUserWithEmailAndPassword(auth, email, password);
-    if (displayName) await updateProfile(user, { displayName });
-    return user;
-  };
+  const { user } = await createUserWithEmailAndPassword(auth, email, password);
+  if (displayName) await updateProfile(user, { displayName });
+  return user;
+};
+
 
   const login = (email: string, password: string) => signInWithEmailAndPassword(auth, email, password);
   const logout = () => signOut(auth);
