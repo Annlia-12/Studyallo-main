@@ -4,13 +4,14 @@ import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, creat
 
 // 🔹 Firebase config (you can replace with actual keys)
 const firebaseConfig = { 
-  apiKey: "AIzaSyBAPBBCKBn14iQdee9Te9rjWKzy4WKCVF4",
-  authDomain: "studyallo.firebaseapp.com",
-  projectId: "studyallo",
-  storageBucket: "studyallo.firebasestorage.app",
-  messagingSenderId: "678998606280",
-  appId: "1:678998606280:web:d0a6607f29a58436e280fd",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
+
 
 
 const app = initializeApp(firebaseConfig);
@@ -57,7 +58,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   if (displayName) await updateProfile(user, { displayName });
   return user;
 };
-
 
   const login = (email: string, password: string) => signInWithEmailAndPassword(auth, email, password);
   const logout = () => signOut(auth);

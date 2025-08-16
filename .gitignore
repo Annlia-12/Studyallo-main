@@ -26,5 +26,4 @@ dist-ssr
 # Ignore env files
 .env
 
-# Optionally ignore AuthContext if it has keys
-src/context/AuthContext.tsx
+
