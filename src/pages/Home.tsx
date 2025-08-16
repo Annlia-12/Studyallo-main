@@ -23,14 +23,14 @@ const collageImages = [
 ];
 
 const quotes = [
-  { text: "Your future is created by what you do today, not tomorrow.", author: "Robert Kiyosaki" },
-  { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
-  { text: "Innovation distinguishes between a leader and a follower.", author: "Steve Jobs" },
-  { text: "Small steps every day lead to big results.", author: "Anonymous" },
-  { text: "The best view comes after the hardest climb.", author: "Anonymous" },
-  { text: "Focus on progress, not perfection.", author: "Anonymous" },
-  { text: "Stay hungry, stay foolish.", author: "Steve Jobs" },
-  { text: "The future belongs to those who learn more skills and combine them creatively.", author: "Robert Greene" },
+  { text: "𝐘𝐨𝐮𝐫 𝐟𝐮𝐭𝐮𝐫𝐞 𝐢𝐬 𝐜𝐫𝐞𝐚𝐭𝐞𝐝 𝐛𝐲 𝐰𝐡𝐚𝐭 𝐲𝐨𝐮 𝐝𝐨 𝐭𝐨𝐝𝐚𝐲, 𝐧𝐨𝐭 𝐭𝐨𝐦𝐨𝐫𝐫𝐨𝐰.", author: "Robert Kiyosaki" },
+  { text: "𝐓𝐡𝐞 𝐨𝐧𝐥𝐲 𝐰𝐚𝐲 𝐭𝐨 𝐝𝐨 𝐠𝐫𝐞𝐚𝐭 𝐰𝐨𝐫𝐤 𝐢𝐬 𝐭𝐨 𝐥𝐨𝐯𝐞 𝐰𝐡𝐚𝐭 𝐲𝐨𝐮 𝐝𝐨.", author: "Steve Jobs" },
+  { text: "𝐈𝐟 𝐲𝐨𝐮 𝐰𝐚𝐧𝐭 𝐭𝐨 𝐟𝐥𝐲, 𝐲𝐨𝐮 𝐡𝐚𝐯𝐞 𝐭𝐨 𝐠𝐢𝐯𝐞 𝐮𝐩 𝐭𝐡𝐞 𝐭𝐡𝐢𝐧𝐠𝐬 𝐭𝐡𝐚𝐭 𝐰𝐞𝐢𝐠𝐡 𝐲𝐨𝐮 𝐝𝐨𝐰𝐧.", author: "Toni Morrison" },
+  { text: "𝐈𝐟 𝐩𝐞𝐨𝐩𝐥𝐞 𝐚𝐫𝐞 𝐝𝐨𝐮𝐛𝐭𝐢𝐧𝐠 𝐡𝐨𝐰 𝐟𝐚𝐫 𝐲𝐨𝐮 𝐜𝐚𝐧 𝐠𝐨, 𝐠𝐨 𝐬𝐨 𝐟𝐚𝐫 𝐭𝐡𝐚𝐭 𝐲𝐨𝐮 𝐜𝐚𝐧’𝐭 𝐡𝐞𝐚𝐫 𝐭𝐡𝐞𝐦 𝐚𝐧𝐲𝐦𝐨𝐫𝐞.", author: "Michele Ruiz" },
+  { text: "𝐈𝐟 𝐲𝐨𝐮'𝐫𝐞 𝐰𝐚𝐥𝐤𝐢𝐧𝐠 𝐝𝐨𝐰𝐧 𝐭𝐡𝐞 𝐫𝐢𝐠𝐡𝐭 𝐩𝐚𝐭𝐡 𝐚𝐧𝐝 𝐲𝐨𝐮'𝐫𝐞 𝐰𝐢𝐥𝐥𝐢𝐧𝐠 𝐭𝐨 𝐤𝐞𝐞𝐩 𝐰𝐚𝐥𝐤𝐢𝐧𝐠, 𝐞𝐯𝐞𝐧𝐭𝐮𝐚𝐥𝐥𝐲 𝐲𝐨𝐮’𝐥𝐥 𝐦𝐚𝐤𝐞 𝐩𝐫𝐨𝐠𝐫𝐞𝐬𝐬.", author: "Barack Obama" },
+  { text: "𝐘𝐨𝐮 𝐡𝐚𝐯𝐞 𝐭𝐨 𝐛𝐞 𝐨𝐤𝐚𝐲 𝐰𝐢𝐭𝐡 𝐠𝐞𝐭𝐭𝐢𝐧𝐠 𝐢𝐭 𝐰𝐫𝐨𝐧𝐠, 𝐟𝐚𝐢𝐥𝐢𝐧𝐠, 𝐚𝐧𝐝 𝐥𝐞𝐚𝐫𝐧𝐢𝐧𝐠 𝐟𝐫𝐨𝐦 𝐢𝐭. 𝐓𝐡𝐚𝐭’𝐬 𝐰𝐡𝐚𝐭 𝐦𝐚𝐤𝐞𝐬 𝐲𝐨𝐮 𝐛𝐞𝐭𝐭𝐞𝐫.", author: "Taylor Swift" },
+  { text: "𝐒𝐭𝐚𝐲 𝐡𝐮𝐧𝐠𝐫𝐲, 𝐬𝐭𝐚𝐲 𝐟𝐨𝐨𝐥𝐢𝐬𝐡.", author: "Steve Jobs" },
+  { text: "𝐓𝐡𝐞 𝐟𝐮𝐭𝐮𝐫𝐞 𝐛𝐞𝐥𝐨𝐧𝐠𝐬 𝐭𝐨 𝐭𝐡𝐨𝐬𝐞 𝐰𝐡𝐨 𝐥𝐞𝐚𝐫𝐧 𝐦𝐨𝐫𝐞 𝐬𝐤𝐢𝐥𝐥𝐬 𝐚𝐧𝐝 𝐜𝐨𝐦𝐛𝐢𝐧𝐞 𝐭𝐡𝐞𝐦 𝐜𝐫𝐞𝐚𝐭𝐢𝐯𝐞𝐥𝐲.", author: "Robert Greene" },
 ];
 
 const features = [
