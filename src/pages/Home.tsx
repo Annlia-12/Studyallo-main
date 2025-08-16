@@ -171,7 +171,10 @@ export default function Home() {
 
         <div className="relative z-10 text-center text-white px-4 max-w-4xl">
           <motion.h1 {...fadeUp} transition={{ duration: 1 }} className="text-5xl md:text-7xl font-bold mb-6">
-            Make Every Minute Build Your Mastery
+            Focus today, shine  {" "}
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-yellow-400 to-indigo-500 animate-gradient">
+              tomorrow
+            </span>
           </motion.h1>
 
           <div className="h-24 mb-8">
