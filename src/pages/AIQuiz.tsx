@@ -1,231 +1,300 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, Upload, FileText, CheckCircle, XCircle, RefreshCw, Trophy } from 'lucide-react';
+import React, { useMemo, useState } from "react";
 
-interface Question {
-  id: number;
+type MCQ = {
   question: string;
-  options: string[];
-  correct: number;
-  explanation?: string;
-}
-
-interface QuizResult {
-  score: number;
-  total: number;
-  percentage: number;
-  answers: boolean[];
-}
-
-// Fallback sample questions
-const sampleQuestions: Question[] = [
-  { id: 1, question: "What is the time complexity of searching in a balanced BST?", options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"], correct: 1, explanation: "Searching takes O(log n) in a balanced BST." },
-  { id: 2, question: "Which sorting algorithm has the best average-case time?", options: ["Bubble", "Quick", "Insertion", "Selection"], correct: 1, explanation: "Quick Sort has O(n log n) average-case." },
-  { id: 3, question: "What data structure implements recursion?", options: ["Queue", "Stack", "Array", "Linked List"], correct: 1, explanation: "Call stack manages function calls." }
-];
+  options: string[]; // length 4
+  correctIndex: number; // 0..3
+};
 
 const AIQuiz: React.FC = () => {
-  const [step, setStep] = useState<'upload'|'generating'|'quiz'|'results'>('upload');
   const [file, setFile] = useState<File | null>(null);
-  const [text, setText] = useState('');
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [current, setCurrent] = useState(0);
-  const [answers, setAnswers] = useState<number[]>([]);
-  const [result, setResult] = useState<QuizResult | null>(null);
+  const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.target.files?.[0] && setFile(e.target.files[0]);
+  // Quiz state
+  const [questions, setQuestions] = useState<MCQ[]>([]);
+  const [step, setStep] = useState<"input" | "quiz" | "result">("input");
+  const [idx, setIdx] = useState(0);
+  const [answers, setAnswers] = useState<number[]>([]); // -1 = not answered
+  const [score, setScore] = useState(0);
+
+  const canGenerate = useMemo(
+    () => (!!file || text.trim().length > 0) && !loading,
+    [file, text, loading]
+  );
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (f) setFile(f);
   };
 
-  const generateQuiz = async () => {
-    if (!file && !text.trim()) return alert('Upload a file or enter text.');
+  const resetQuiz = () => {
+    setQuestions([]);
+    setAnswers([]);
+    setIdx(0);
+    setScore(0);
+    setStep("input");
+  };
+
+  const startQuizFromData = (qs: MCQ[]) => {
+    setQuestions(qs);
+    setAnswers(Array(qs.length).fill(-1));
+    setIdx(0);
+    setScore(0);
+    setStep("quiz");
+  };
+
+  const handleGenerate = async () => {
+    if (!canGenerate) return;
     setLoading(true);
-    setStep('generating');
-    setError('');
 
     try {
       const formData = new FormData();
-      if (file) formData.append('file', file);
-      if (text.trim()) formData.append('text', text.trim());
+      if (file) formData.append("file", file);
+      if (text.trim()) formData.append("text", text);
 
-      const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/generate-quiz`, {
-        method: 'POST',
-        body: formData
+      const res = await fetch("http://localhost:5000/api/generate-questions", {
+        method: "POST",
+        body: formData,
       });
 
-      if (!res.ok) throw new Error(`Server error: ${res.statusText}`);
       const data = await res.json();
 
-      if (data.questions && data.questions.length > 0) {
-        setQuestions(data.questions);
-      } else {
-        // fallback to sample questions
-        setQuestions(sampleQuestions);
+      if (!res.ok) {
+        throw new Error(data?.error || "Failed to generate questions");
       }
 
-      setStep('quiz');
+      // Expecting { questions: MCQ[] }
+      if (!data?.questions || !Array.isArray(data.questions)) {
+        throw new Error("Server returned unexpected format.");
+      }
+
+      startQuizFromData(data.questions);
     } catch (err: any) {
       console.error(err);
-      setError('Failed to generate quiz. Showing sample questions.');
-      setQuestions(sampleQuestions);
-      setStep('quiz');
+      alert(err.message || "Error generating questions.");
     } finally {
       setLoading(false);
     }
   };
 
-  const selectAnswer = (i: number) => {
-    const a = [...answers];
-    a[current] = i;
-    setAnswers(a);
+  const selectOption = (optionIndex: number) => {
+    const next = [...answers];
+    next[idx] = optionIndex;
+    setAnswers(next);
   };
 
-  const next = () => {
-    if (current < questions.length - 1) setCurrent(current + 1);
-    else {
-      const corrects = answers.map((a, i) => a === questions[i].correct);
-      const score = corrects.filter(Boolean).length;
-      setResult({
-        score,
-        total: questions.length,
-        percentage: Math.round((score / questions.length) * 100),
-        answers: corrects
-      });
-      setStep('results');
-    }
+  const goNext = () => setIdx((i) => Math.min(i + 1, questions.length - 1));
+  const goPrev = () => setIdx((i) => Math.max(i - 1, 0));
+
+  const submitQuiz = () => {
+    const sc = answers.reduce((sum, ans, i) => {
+      if (ans === questions[i].correctIndex) return sum + 1;
+      return sum;
+    }, 0);
+    setScore(sc);
+    setStep("result");
   };
 
-  const restart = () => {
-    setStep('upload');
-    setFile(null);
-    setText('');
-    setQuestions([]);
-    setCurrent(0);
-    setAnswers([]);
-    setResult(null);
-    setError('');
-  };
-
-  const retake = () => {
-    setCurrent(0);
-    setAnswers([]);
-    setResult(null);
-    setStep('quiz');
-  };
-
-  const progress = questions.length ? Math.round(((current + 1) / questions.length) * 100) : 0;
+  // UI helpers
+  const current = questions[idx];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#f5eaff] via-[#eef4ff] to-[#f9fbff]">
+      <div className="max-w-5xl mx-auto px-4 py-12">
         {/* Header */}
-        <motion.div initial={{opacity:0,y:30}} animate={{opacity:1,y:0}} transition={{duration:0.6}} className="text-center mb-12">
-          <div className="bg-gradient-to-r from-purple-500 to-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Brain className="h-8 w-8 text-white" />
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-purple-100 mb-4">
+            <span className="text-2xl">🧠</span>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">AI Quiz Generator</h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">Transform your notes into personalized quizzes powered by AI.</p>
-        </motion.div>
-
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <AnimatePresence mode="wait">
-            {step==='upload' && (
-              <motion.div key="upload" initial={{opacity:0,x:50}} animate={{opacity:1,x:0}} exit={{opacity:0,x:-50}} className="p-8">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-8 text-center">Upload Your Study Material</h2>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium text-gray-900 flex items-center">
-                      <Upload className="h-5 w-5 mr-2"/>Upload File
-                    </h3>
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors">
-                      <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4"/>
-                      <p className="text-gray-600 mb-4">Upload PDF, DOCX, or image files</p>
-                      <label className="bg-blue-500 text-white px-6 py-3 rounded-lg cursor-pointer hover:bg-blue-600">
-                        Choose File <input type="file" accept=".pdf,.docx,.jpg,.jpeg,.png,.txt" onChange={handleFile} className="hidden"/>
-                      </label>
-                      {file && <p className="mt-4 text-sm text-green-600 font-medium">File selected: {file.name}</p>}
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium text-gray-900">Or Paste Text</h3>
-                    <textarea rows={10} value={text} onChange={e=>setText(e.target.value)} placeholder="Paste your notes..." className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"/>
-                  </div>
-                </div>
-                {error && <p className="text-red-600 mt-4 text-center">{error}</p>}
-                <div className="mt-8 text-center">
-                  <motion.button whileHover={{scale:1.05}} whileTap={{scale:0.95}} onClick={generateQuiz} disabled={!file && !text.trim()} className="bg-gradient-to-r from-purple-500 to-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg transition-shadow">Generate AI Quiz</motion.button>
-                </div>
-              </motion.div>
-            )}
-
-            {step==='generating' && (
-              <motion.div key="generating" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="p-8 text-center py-16">
-                <motion.div animate={{rotate:360}} transition={{duration:2,repeat:Infinity,ease:"linear"}} className="bg-gradient-to-r from-purple-500 to-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Brain className="h-8 w-8 text-white"/>
-                </motion.div>
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">Generating Your Quiz...</h2>
-                <p className="text-gray-600">AI is analyzing your material. Please wait.</p>
-              </motion.div>
-            )}
-
-            {step==='quiz' && questions.length>0 && (
-              <motion.div key="quiz" initial={{opacity:0,x:50}} animate={{opacity:1,x:0}} exit={{opacity:0,x:-50}} className="p-8">
-                <div className="mb-8">
-                  <div className="flex justify-between mb-2"><span className="text-sm font-medium text-gray-600">Question {current+1} of {questions.length}</span><span className="text-sm font-medium text-gray-600">{progress}%</span></div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-gradient-to-r from-purple-500 to-blue-600 h-2 rounded-full transition-all duration-300" style={{width:`${progress}%`}}/>
-                  </div>
-                </div>
-                <h2 className="text-2xl font-semibold text-gray-900 mb-6">{questions[current].question}</h2>
-                <div className="space-y-3">
-                  {questions[current].options.map((o,i)=>
-                    <motion.button key={i} whileHover={{scale:1.02}} whileTap={{scale:0.98}} onClick={()=>selectAnswer(i)} className={`w-full p-4 text-left rounded-lg border-2 transition-colors ${answers[current]===i?'border-blue-500 bg-blue-50 text-blue-900':'border-gray-200 hover:border-gray-300 hover:bg-gray-50'}`}>
-                      <span className="font-medium mr-3">{String.fromCharCode(65+i)}.</span>{o}
-                    </motion.button>
-                  )}
-                </div>
-                <div className="text-center mt-6">
-                  <motion.button whileHover={{scale:1.05}} whileTap={{scale:0.95}} onClick={next} disabled={answers[current]===undefined} className="bg-gradient-to-r from-purple-500 to-blue-600 text-white px-8 py-3 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg transition-shadow">{current===questions.length-1?'Finish Quiz':'Next Question'}</motion.button>
-                </div>
-              </motion.div>
-            )}
-
-            {step==='results' && result && (
-              <motion.div key="results" initial={{opacity:0,scale:0.9}} animate={{opacity:1,scale:1}} exit={{opacity:0,scale:0.9}} className="p-8 text-center">
-                <div className="mb-8">
-                  <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 ${result.percentage>=80?'bg-green-100':result.percentage>=60?'bg-yellow-100':'bg-red-100'}`}>
-                    {result.percentage>=80?<Trophy className="h-10 w-10 text-green-600"/>:result.percentage>=60?<CheckCircle className="h-10 w-10 text-yellow-600"/>:<XCircle className="h-10 w-10 text-red-600"/>}
-                  </div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Quiz Complete!</h2>
-                  <p className="text-xl text-gray-600 mb-6">You scored {result.score} out of {result.total} ({result.percentage}%)</p>
-                  <div className={`p-4 rounded-lg mb-6 ${result.percentage>=80?'bg-green-50 text-green-800':result.percentage>=60?'bg-yellow-50 text-yellow-800':'bg-red-50 text-red-800'}`}>
-                    {result.percentage>=80?"Excellent work!":result.percentage>=60?"Good job!": "Keep studying!"}
-                  </div>
-                </div>
-                <div className="mb-8 text-left max-w-2xl mx-auto space-y-4">
-                  {questions.map((q,i)=>
-                    <div key={i} className={`p-4 rounded-lg border ${result.answers[i]?'border-green-200 bg-green-50':'border-red-200 bg-red-50'}`}>
-                      <div className="flex items-start">
-                        {result.answers[i]?<CheckCircle className="h-5 w-5 text-green-600 mt-1 mr-3 flex-shrink-0"/>:<XCircle className="h-5 w-5 text-red-600 mt-1 mr-3 flex-shrink-0"/>}
-                        <div>
-                          <p className="font-medium text-gray-900 mb-2">{q.question}</p>
-                          <p className="text-sm text-gray-600"><span className="font-medium">Correct:</span> {q.options[q.correct]}</p>
-                          {q.explanation && <p className="text-sm text-gray-600 mt-1"><span className="font-medium">Explanation:</span> {q.explanation}</p>}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <motion.button whileHover={{scale:1.05}} whileTap={{scale:0.95}} onClick={retake} className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-shadow"><RefreshCw className="h-5 w-5 inline mr-2"/>Retake Quiz</motion.button>
-                  <motion.button whileHover={{scale:1.05}} whileTap={{scale:0.95}} onClick={restart} className="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors">Create New Quiz</motion.button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <h1 className="text-4xl font-extrabold text-gray-800">AI Quiz Generator</h1>
+          <p className="text-gray-600 mt-2">
+            Transform your notes into personalized MCQ quizzes powered by AI.
+          </p>
         </div>
+
+        {step === "input" && (
+          <div className="mx-auto max-w-3xl bg-white rounded-2xl shadow-lg p-8">
+            <h2 className="text-xl font-semibold text-center mb-6">
+              Upload Your Study Material
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Upload box */}
+              <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 flex flex-col items-center justify-center text-center">
+                <div className="text-5xl mb-4">📄</div>
+                <p className="text-gray-500 mb-4">Upload PDF, DOCX, or image files</p>
+                <label className="inline-block">
+                  <input
+                    type="file"
+                    accept=".txt,.pdf,.docx,.jpg,.jpeg,.png"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+                  <span className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg cursor-pointer">
+                    Choose File
+                  </span>
+                </label>
+                {file && (
+                  <p className="text-sm text-gray-600 mt-3 truncate max-w-[220px]">
+                    Selected: {file.name}
+                  </p>
+                )}
+              </div>
+
+              {/* Textarea */}
+              <div>
+                <textarea
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  placeholder="Paste your notes, textbook chapters, or any study material here..."
+                  className="w-full h-48 p-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-300"
+                />
+              </div>
+            </div>
+
+            <div className="text-center mt-8">
+              <button
+                disabled={!canGenerate}
+                onClick={handleGenerate}
+                className={`px-6 py-3 rounded-xl text-white shadow-md transition
+                ${canGenerate ? "bg-gradient-to-r from-purple-600 to-indigo-500 hover:opacity-90"
+                               : "bg-gray-300 cursor-not-allowed"}`}
+              >
+                {loading ? "Generating..." : "Generate AI Quiz"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === "quiz" && current && (
+          <div className="mx-auto max-w-3xl bg-white rounded-2xl shadow-lg p-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold">
+                Question {idx + 1} of {questions.length}
+              </h2>
+              <button
+                className="text-sm text-gray-500 hover:text-gray-700"
+                onClick={resetQuiz}
+              >
+                ← Start over
+              </button>
+            </div>
+
+            <p className="text-lg font-medium text-gray-800 mb-6">{current.question}</p>
+
+            <div className="space-y-3">
+              {current.options.map((opt, i) => {
+                const selected = answers[idx] === i;
+                return (
+                  <button
+                    key={i}
+                    onClick={() => selectOption(i)}
+                    className={`w-full text-left p-3 rounded-xl border transition
+                    ${selected ? "border-purple-500 bg-purple-50"
+                               : "border-gray-200 hover:bg-gray-50"}`}
+                  >
+                    <span className="font-semibold mr-2">{String.fromCharCode(65 + i)})</span>
+                    {opt}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex items-center justify-between mt-8">
+              <button
+                onClick={goPrev}
+                disabled={idx === 0}
+                className={`px-4 py-2 rounded-lg border
+                ${idx === 0 ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                             : "text-gray-700 border-gray-300 hover:bg-gray-50"}`}
+              >
+                Back
+              </button>
+
+              {idx < questions.length - 1 ? (
+                <button
+                  onClick={goNext}
+                  disabled={answers[idx] === -1}
+                  className={`px-5 py-2 rounded-lg text-white transition
+                  ${answers[idx] === -1
+                    ? "bg-gray-300 cursor-not-allowed"
+                    : "bg-indigo-600 hover:bg-indigo-700"}`}
+                >
+                  Next
+                </button>
+              ) : (
+                <button
+                  onClick={submitQuiz}
+                  disabled={answers[idx] === -1}
+                  className={`px-5 py-2 rounded-lg text-white transition
+                  ${answers[idx] === -1
+                    ? "bg-gray-300 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700"}`}
+                >
+                  Submit
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {step === "result" && (
+          <div className="mx-auto max-w-3xl bg-white rounded-2xl shadow-lg p-8 text-center">
+            <h2 className="text-2xl font-bold mb-2">Quiz Completed 🎉</h2>
+            <p className="text-lg text-gray-700 mb-6">
+              You scored <span className="font-bold">{score}</span> out of{" "}
+              {questions.length}
+            </p>
+
+            {/* Review */}
+            <div className="text-left space-y-6">
+              {questions.map((q, i) => {
+                const user = answers[i];
+                const correct = q.correctIndex;
+                const isRight = user === correct;
+                return (
+                  <div key={i} className="p-4 rounded-xl border border-gray-200">
+                    <p className="font-semibold mb-2">
+                      {i + 1}. {q.question}
+                    </p>
+                    <ul className="ml-1 space-y-1">
+                      {q.options.map((opt, j) => (
+                        <li key={j}>
+                          <span className="font-semibold mr-1">{String.fromCharCode(65 + j)})</span>
+                          <span
+                            className={
+                              j === correct
+                                ? "text-green-700"
+                                : j === user && !isRight
+                                ? "text-red-700"
+                                : "text-gray-700"
+                            }
+                          >
+                            {opt}
+                          </span>
+                          {j === correct && <span className="ml-2 text-green-700">✓</span>}
+                          {j === user && j !== correct && (
+                            <span className="ml-2 text-red-700">✗</span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="mt-8">
+              <button
+                onClick={resetQuiz}
+                className="px-6 py-3 rounded-xl text-white bg-purple-600 hover:bg-purple-700"
+              >
+                Create Another Quiz
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,8 +1,17 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { initializeApp } from "firebase/app";
-import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, User } from "firebase/auth";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  User,
+} from "firebase/auth";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 
-// 🔹 Firebase config (you can replace with actual keys)
+// 🔹 Firebase config
 const firebaseConfig = { 
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -12,15 +21,14 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-
-
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signup: (email: string, password: string, displayName?: string) => Promise<User>;
+  signup: (email: string, password: string, displayName?: string, role?: "mentor" | "mentee" | "both") => Promise<User>;
   login: (email: string, password: string) => Promise<any>;
   logout: () => Promise<void>;
 }
@@ -31,20 +39,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔹 Create initial test user for setup
-  useEffect(() => {
-    const createInitialUser = async () => {
-      try {
-        await createUserWithEmailAndPassword(auth, "test@studyallo.com", "Test1234!");
-      } catch (error: any) {
-        if (error.code !== "auth/email-already-in-use") {
-          console.error("Error creating initial user:", error);
-        }
-      }
-    };
-    createInitialUser();
-  }, []);
-
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
@@ -53,11 +47,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => unsub();
   }, []);
 
-  const signup = async (email: string, password: string, displayName?: string) => {
-  const { user } = await createUserWithEmailAndPassword(auth, email, password);
-  if (displayName) await updateProfile(user, { displayName });
-  return user;
-};
+  const signup = async (
+    email: string,
+    password: string,
+    displayName?: string,
+    role: "mentor" | "mentee" | "both" = "mentee"
+  ) => {
+    const { user } = await createUserWithEmailAndPassword(auth, email, password);
+    if (displayName) await updateProfile(user, { displayName });
+
+    // Save additional user info (role) in Firestore
+    await setDoc(doc(db, "users", user.uid), {
+      uid: user.uid,
+      email: user.email,
+      displayName: displayName || "",
+      role,
+      createdAt: new Date(),
+    });
+
+    return user;
+  };
 
   const login = (email: string, password: string) => signInWithEmailAndPassword(auth, email, password);
   const logout = () => signOut(auth);
