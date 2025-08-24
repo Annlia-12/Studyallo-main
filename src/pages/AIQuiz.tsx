@@ -6,6 +6,10 @@ type MCQ = {
   correctIndex: number; // 0..3
 };
 
+// ✅ Set API base (localhost for dev, "" for prod)
+const API_BASE =
+  import.meta.env.DEV ? "http://localhost:5000" : "";
+
 const AIQuiz: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [text, setText] = useState("");
@@ -53,7 +57,8 @@ const AIQuiz: React.FC = () => {
       if (file) formData.append("file", file);
       if (text.trim()) formData.append("text", text);
 
-      const res = await fetch("http://localhost:5000/api/generate-questions", {
+      // ✅ Use dynamic API_BASE
+      const res = await fetch(`${API_BASE}/api/generate-questions`, {
         method: "POST",
         body: formData,
       });
@@ -158,8 +163,11 @@ const AIQuiz: React.FC = () => {
                 disabled={!canGenerate}
                 onClick={handleGenerate}
                 className={`px-6 py-3 rounded-xl text-white shadow-md transition
-                ${canGenerate ? "bg-gradient-to-r from-purple-600 to-indigo-500 hover:opacity-90"
-                               : "bg-gray-300 cursor-not-allowed"}`}
+                ${
+                  canGenerate
+                    ? "bg-gradient-to-r from-purple-600 to-indigo-500 hover:opacity-90"
+                    : "bg-gray-300 cursor-not-allowed"
+                }`}
               >
                 {loading ? "Generating..." : "Generate AI Quiz"}
               </button>
@@ -191,8 +199,11 @@ const AIQuiz: React.FC = () => {
                     key={i}
                     onClick={() => selectOption(i)}
                     className={`w-full text-left p-3 rounded-xl border transition
-                    ${selected ? "border-purple-500 bg-purple-50"
-                               : "border-gray-200 hover:bg-gray-50"}`}
+                    ${
+                      selected
+                        ? "border-purple-500 bg-purple-50"
+                        : "border-gray-200 hover:bg-gray-50"
+                    }`}
                   >
                     <span className="font-semibold mr-2">{String.fromCharCode(65 + i)})</span>
                     {opt}
@@ -206,8 +217,11 @@ const AIQuiz: React.FC = () => {
                 onClick={goPrev}
                 disabled={idx === 0}
                 className={`px-4 py-2 rounded-lg border
-                ${idx === 0 ? "text-gray-400 border-gray-200 cursor-not-allowed"
-                             : "text-gray-700 border-gray-300 hover:bg-gray-50"}`}
+                ${
+                  idx === 0
+                    ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                    : "text-gray-700 border-gray-300 hover:bg-gray-50"
+                }`}
               >
                 Back
               </button>
@@ -217,9 +231,11 @@ const AIQuiz: React.FC = () => {
                   onClick={goNext}
                   disabled={answers[idx] === -1}
                   className={`px-5 py-2 rounded-lg text-white transition
-                  ${answers[idx] === -1
-                    ? "bg-gray-300 cursor-not-allowed"
-                    : "bg-indigo-600 hover:bg-indigo-700"}`}
+                  ${
+                    answers[idx] === -1
+                      ? "bg-gray-300 cursor-not-allowed"
+                      : "bg-indigo-600 hover:bg-indigo-700"
+                  }`}
                 >
                   Next
                 </button>
@@ -228,9 +244,11 @@ const AIQuiz: React.FC = () => {
                   onClick={submitQuiz}
                   disabled={answers[idx] === -1}
                   className={`px-5 py-2 rounded-lg text-white transition
-                  ${answers[idx] === -1
-                    ? "bg-gray-300 cursor-not-allowed"
-                    : "bg-green-600 hover:bg-green-700"}`}
+                  ${
+                    answers[idx] === -1
+                      ? "bg-gray-300 cursor-not-allowed"
+                      : "bg-green-600 hover:bg-green-700"
+                  }`}
                 >
                   Submit
                 </button>
