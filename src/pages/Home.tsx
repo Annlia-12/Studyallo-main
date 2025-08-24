@@ -232,22 +232,79 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Gallery */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
-        <motion.div {...fadeUp} className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-4">Study Aesthetic</h2>
-          <p className="text-xl text-gray-600">Beautiful spaces that inspire learning</p>
-        </motion.div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-7xl mx-auto px-4">
-          {studyImages.map((src, i) => (
-            <motion.div key={i} initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ delay: i * 0.1 }} whileHover={{ scale: 1.05 }} className="relative overflow-hidden rounded-xl shadow-md">
-              <img src={src} alt="" className="w-full h-40 object-cover" loading="lazy"/>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 hover:opacity-100 transition-opacity"/>
-            </motion.div>
+   {/* Pinterest-Style Study Tools - Animated Backgrounds */}
+<section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+  <motion.div {...fadeUp} className="text-center mb-16 relative z-10">
+    <h2 className="text-4xl font-extrabold mb-4 text-black">Study Tools</h2>
+    <p className="text-xl font-bold text-black">Handy helpers to stay productive</p>
+  </motion.div>
+
+  <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 max-w-7xl mx-auto px-4">
+    {[
+      { title: "Pomodoro Timer", desc: "25/5 method for focus", color: "bg-red-100",
+        images: [
+          "https://i.pinimg.com/1200x/40/c7/a1/40c7a1d4c9fedf962e86fcca0fbf1c6b.jpg",
+          "https://i.pinimg.com/736x/32/f5/d4/32f5d437e6abeff0ef1bff738d1b189c.jpg",
+          "https://i.pinimg.com/1200x/73/1c/04/731c0406764a7e4d023a9fe4001b1d45.jpg",
+          "https://i.pinimg.com/736x/6f/d3/0c/6fd30c7b0937384bdb1e91310b03fdc8.jpg",
+          "https://i.pinimg.com/1200x/26/ca/f7/26caf7b83e94eab9232690798f92db80.jpg",
+          "https://i.pinimg.com/1200x/7d/79/17/7d7917f9feb22f49d9e82d71472c87d8.jpg"
+        ]
+      },
+      { title: "Daily Goal", desc: "Set & track 3 goals", color: "bg-yellow-100", images: ["https://i.pinimg.com/1200x/40/c7/a1/40c7a1d4c9fedf962e86fcca0fbf1c6b.jpg","https://i.pinimg.com/736x/32/f5/d4/32f5d437e6abeff0ef1bff738d1b189c.jpg","https://i.pinimg.com/1200x/73/1c/04/731c0406764a7e4d023a9fe4001b1d45.jpg","https://i.pinimg.com/736x/6f/d3/0c/6fd30c7b0937384bdb1e91310b03fdc8.jpg","https://i.pinimg.com/1200x/26/ca/f7/26caf7b83e94eab9232690798f92db80.jpg","https://i.pinimg.com/1200x/7d/79/17/7d7917f9feb22f49d9e82d71472c87d8.jpg"] },
+      { title: "Quiz Me", desc: "Random quick questions", color: "bg-green-100", images: ["https://i.pinimg.com/1200x/40/c7/a1/40c7a1d4c9fedf962e86fcca0fbf1c6b.jpg","https://i.pinimg.com/736x/32/f5/d4/32f5d437e6abeff0ef1bff738d1b189c.jpg","https://i.pinimg.com/1200x/73/1c/04/731c0406764a7e4d023a9fe4001b1d45.jpg","https://i.pinimg.com/736x/6f/d3/0c/6fd30c7b0937384bdb1e91310b03fdc8.jpg","https://i.pinimg.com/1200x/26/ca/f7/26caf7b83e94eab9232690798f92db80.jpg","https://i.pinimg.com/1200x/7d/79/17/7d7917f9feb22f49d9e82d71472c87d8.jpg"] },
+      { title: "To-Do", desc: "Organize your study list", color: "bg-blue-100", images: ["https://i.pinimg.com/1200x/40/c7/a1/40c7a1d4c9fedf962e86fcca0fbf1c6b.jpg","https://i.pinimg.com/736x/32/f5/d4/32f5d437e6abeff0ef1bff738d1b189c.jpg","https://i.pinimg.com/1200x/73/1c/04/731c0406764a7e4d023a9fe4001b1d45.jpg","https://i.pinimg.com/736x/6f/d3/0c/6fd30c7b0937384bdb1e91310b03fdc8.jpg","https://i.pinimg.com/1200x/26/ca/f7/26caf7b83e94eab9232690798f92db80.jpg","https://i.pinimg.com/1200x/7d/79/17/7d7917f9feb22f49d9e82d71472c87d8.jpg"] },
+      { title: "Focus Music", desc: "Boost concentration", color: "bg-indigo-100", images: ["https://i.pinimg.com/1200x/40/c7/a1/40c7a1d4c9fedf962e86fcca0fbf1c6b.jpg","https://i.pinimg.com/736x/32/f5/d4/32f5d437e6abeff0ef1bff738d1b189c.jpg","https://i.pinimg.com/1200x/73/1c/04/731c0406764a7e4d023a9fe4001b1d45.jpg","https://i.pinimg.com/736x/6f/d3/0c/6fd30c7b0937384bdb1e91310b03fdc8.jpg","https://i.pinimg.com/1200x/26/ca/f7/26caf7b83e94eab9232690798f92db80.jpg","https://i.pinimg.com/1200x/7d/79/17/7d7917f9feb22f49d9e82d71472c87d8.jpg"] },
+      { title: "Quick Notes", desc: "Jot & remember", color: "bg-teal-100", images: ["https://i.pinimg.com/1200x/40/c7/a1/40c7a1d4c9fedf962e86fcca0fbf1c6b.jpg","https://i.pinimg.com/736x/32/f5/d4/32f5d437e6abeff0ef1bff738d1b189c.jpg","https://i.pinimg.com/1200x/73/1c/04/731c0406764a7e4d023a9fe4001b1d45.jpg","https://i.pinimg.com/736x/6f/d3/0c/6fd30c7b0937384bdb1e91310b03fdc8.jpg","https://i.pinimg.com/1200x/26/ca/f7/26caf7b83e94eab9232690798f92db80.jpg","https://i.pinimg.com/1200x/7d/79/17/7d7917f9feb22f49d9e82d71472c87d8.jpg"] },
+      { title: "Connect with Mentors", desc: "Learn life and study lessons from experienced guides", color: "bg-orange-100", images: ["https://i.pinimg.com/1200x/40/c7/a1/40c7a1d4c9fedf962e86fcca0fbf1c6b.jpg","https://i.pinimg.com/736x/32/f5/d4/32f5d437e6abeff0ef1bff738d1b189c.jpg","https://i.pinimg.com/1200x/73/1c/04/731c0406764a7e4d023a9fe4001b1d45.jpg","https://i.pinimg.com/736x/6f/d3/0c/6fd30c7b0937384bdb1e91310b03fdc8.jpg","https://i.pinimg.com/1200x/26/ca/f7/26caf7b83e94eab9232690798f92db80.jpg","https://i.pinimg.com/1200x/7d/79/17/7d7917f9feb22f49d9e82d71472c87d8.jpg"] },
+     ].map((tool, i) => (
+      <motion.div
+  whileHover={{ scale: 1.05 }}
+
+
+        className={`group break-inside-avoid p-6 mb-6 rounded-2xl shadow-lg cursor-pointer relative overflow-hidden ${tool.color} hover:shadow-2xl hover:translate-y-[-4px] transition-all duration-300`}>
+
+        {/* Animated Background */}
+        <div className="absolute inset-0 -z-10">
+          {tool.images.map((img, idx) => (
+            <img
+              key={idx}
+              src={img}
+              alt=""
+              className={`w-full h-full object-cover absolute top-0 left-0 opacity-0 animate-fadeBg animation-delay-${idx*2}s`}
+            />
           ))}
         </div>
-      </section>
+
+        {/* Content */}
+        <h3 className="font-bold text-lg mb-2 relative z-10 text-black group-hover:text-white">{tool.title}</h3>
+        <p className="font-bold relative z-10 text-black group-hover:text-white">{tool.desc}</p>
+      </motion.div>
+    ))}
+  </div>
+
+  <style>
+    {`
+      @keyframes fadeBg {
+        0% { opacity: 0; }
+        10% { opacity: 1; }
+        30% { opacity: 1; }
+        40% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+      .animate-fadeBg {
+        animation: fadeBg 12s linear infinite;
+      }
+      .animation-delay-0s { animation-delay: 0s; }
+      .animation-delay-2s { animation-delay: 2s; }
+      .animation-delay-4s { animation-delay: 4s; }
+      .animation-delay-6s { animation-delay: 6s; }
+      .animation-delay-8s { animation-delay: 8s; }
+      .animation-delay-10s { animation-delay: 10s; }
+    `}
+  </style>
+</section>
+
 
       {/* Collage CTA */}
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">

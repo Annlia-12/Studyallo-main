@@ -101,7 +101,8 @@ const StudyBuddy: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-pink-100 via-purple-100 via-blue-100 via-indigo-100 to-pink-100 relative overflow-hidden py-8">
+     <div className="min-h-screen bg-gradient-to-b from-sky-50 via-sky-100 to-sky-200 relative overflow-hidden py-8">
+
 
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

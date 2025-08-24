@@ -63,7 +63,8 @@ const Timer: React.FC = () => {
   const progress = ((duration - timeLeft) / duration) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-pink-100 via-purple-100 via-blue-100 via-indigo-100 to-pink-100 py-8">
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 via-purple-100 to-purple-200 relative overflow-hidden py-8">
+
       {/* Distraction Alert */}
       {showDistraction && (
         <motion.div

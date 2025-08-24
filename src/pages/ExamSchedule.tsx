@@ -43,7 +43,8 @@ const ExamSchedule: React.FC = () => {
     'bg-green-100 text-green-800 border-green-200';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-8">
+     <div className="min-h-screen bg-gradient-to-b from-green-50 via-green-100 to-green-200 relative overflow-hidden py-8">
+
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Exam Schedule</h1>
