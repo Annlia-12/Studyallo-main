@@ -17,8 +17,8 @@ interface Exam {
 const ExamSchedule: React.FC = () => {
   const [exams, setExams] = useState<Exam[]>([
     { id: '1', subject: 'Data Structures & Algorithms', date: '2025-01-25', time: '09:00', location: 'CSE C-101', duration: 180, type: 'Midterm', notes: 'Focus on trees, graphs, DP', daysLeft: 5 },
-    { id: '2', subject: 'Mathematics For Information Science', date: '2025-01-28', time: '14:00', location: 'EEE-105', duration: 120, type: 'Final', notes: 'Reaction mechanisms', daysLeft: 8 },
-    { id: '3', subject: 'Theory Of Computation', date: '2025-02-02', time: '10:30', location: 'ECE- 301', duration: 150, type: 'Midterm', notes: 'Integration & series', daysLeft: 13 },
+    { id: '2', subject: 'Mathematics For Information Science', date: '2025-01-28', time: '14:00', location: 'EEE-105', duration: 120, type: 'Final', notes: 'Binomial Distribution', daysLeft: 8 },
+    { id: '3', subject: 'Theory Of Computation', date: '2025-02-02', time: '10:30', location: 'ECE- 301', duration: 150, type: 'Midterm', notes: 'Module 1 and Module 2 complete', daysLeft: 13 },
   ]);
   const [showForm, setShowForm] = useState(false);
   const [newExam, setNewExam] = useState({ subject: '', date: '', time: '', location: '', duration: 120, type: 'Midterm', notes: '' });
