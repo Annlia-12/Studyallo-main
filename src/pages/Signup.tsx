@@ -1,80 +1,60 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { useAuth } from "../context/AuthContext";
+import { supabase } from "../supabaseClient";
+import { useNavigate, Link } from "react-router-dom";
 
-export default function Signup() {
-  const { signup } = useAuth();
+const Signup = () => {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
-  const [err, setErr] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErr("");
-    try {
-      setLoading(true);
-      await signup(form.email.trim(), form.password, form.name.trim());
-      navigate("/"); // redirect after signup
-    } catch (e: any) {
-      setErr(e.message || "Signup failed");
-    } finally {
-      setLoading(false);
+  const handleSignup = async () => {
+    const { data, error } = await supabase.auth.signUp({ email, password });
+
+    if (error) {
+      setError(error.message);
+    } else {
+      alert("Signup successful! Check your email to confirm.");
+      navigate("/login");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 px-4">
-      <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md bg-white rounded-2xl p-8 shadow-sm border">
-        <h1 className="text-2xl font-bold mb-2">Create your account</h1>
-        <p className="text-gray-600 mb-6">It only takes a minute.</p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100">
+      <div className="bg-white rounded-3xl shadow-2xl p-10 w-full max-w-md">
+        <h2 className="text-3xl font-bold mb-6 text-center text-purple-700">Create Account</h2>
 
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div>
-            <label className="text-sm text-gray-700">Name</label>
-            <input
-              type="text"
-              required
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="mt-1 w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
 
-          <div>
-            <label className="text-sm text-gray-700">Email</label>
-            <input
-              type="email"
-              required
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="mt-1 w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full mb-4 p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-300 outline-none transition"
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full mb-6 p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-300 outline-none transition"
+        />
 
-          <div>
-            <label className="text-sm text-gray-700">Password</label>
-            <input
-              type="password"
-              required
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className="mt-1 w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+        <button
+          onClick={handleSignup}
+          className="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 rounded-xl transition"
+        >
+          Sign Up
+        </button>
 
-          {err && <div className="text-sm text-red-600">{err}</div>}
-
-          <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white rounded-xl py-2.5 font-semibold disabled:opacity-60">
-            {loading ? "Creating account…" : "Sign Up"}
-          </button>
-        </form>
-
-        <div className="mt-6 text-sm text-gray-600">
-          Already have an account? <Link to="/login" className="text-blue-600 font-medium">Log in</Link>
-        </div>
-      </motion.div>
+        <p className="mt-4 text-center text-gray-500">
+          Already have an account?{" "}
+          <Link to="/login" className="text-purple-500 hover:underline">Login</Link>
+        </p>
+      </div>
     </div>
   );
-}
+};
+
+export default Signup;
